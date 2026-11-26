@@ -12,7 +12,10 @@ export const appConfig: ApplicationConfig = {
 		provideFileRouter(
 			withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }),
 			withNavigationErrorHandler(console.log),
-			withPreloading(PreloadAllModules),
+			// Preloading every lazy page in dev makes Vite compile all ~140 pages (and every example they
+			// import) on both the server and the client right after the first navigation, which stalls
+			// the dev server for many seconds. Production chunks are prebuilt, so keep it there.
+			...(import.meta.env.DEV ? [] : [withPreloading(PreloadAllModules)]),
 		),
 		provideClientHydration(),
 		provideTrpcClient(),
