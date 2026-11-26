@@ -74,27 +74,76 @@
 		},
 		"generate-ui-docs": {
 			"executor": "@spartan-ng/tools:generate-ui-docs",
-			"cache": false,
+			"cache": true,
 			"options": {
 				"outputDir": "apps/app/src/public/data",
 				"brainDir": "libs/brain",
 				"helmDir": "libs/helm"
-			}
+			},
+			"inputs": [
+				"{workspaceRoot}/libs/brain/**/*.ts",
+				"{workspaceRoot}/libs/helm/**/*.ts",
+				"!{workspaceRoot}/libs/brain/**/*.spec.ts",
+				"!{workspaceRoot}/libs/helm/**/*.spec.ts",
+				"{workspaceRoot}/libs/tools/src/executors/docs/generate-ui-docs/**/*",
+				"{workspaceRoot}/libs/tools/src/write-per-component-data.ts",
+				"{workspaceRoot}/tsconfig.base.json",
+				{
+					"externalDependencies": ["ts-morph"]
+				}
+			],
+			"outputs": ["{options.outputDir}/ui-api"]
 		},
 		"generate-docs-and-snippets": {
-			"executor": "nx:run-commands",
-			"cache": false,
-			"options": {
-				"commands": ["nx run app:generate-ui-docs", "npx nx generate @spartan-ng/tools:generate-primitive-snippets"],
-				"parallel": false
-			}
+			"executor": "nx:noop",
+			"dependsOn": ["generate-ui-docs", "generate-primitive-snippets"]
 		},
 		"generate-hlm-component-preview": {
 			"executor": "nx:run-commands",
-			"cache": false,
+			"cache": true,
+			"inputs": [
+				"{projectRoot}/src/app/pages/**/*",
+				"!{projectRoot}/src/app/pages/**/hlm-tailwind-preset.snippet.ts",
+				"{workspaceRoot}/libs/cli/**/*",
+				"{workspaceRoot}/libs/registry/src/styles/**/*",
+				"{workspaceRoot}/libs/brain/package.json",
+				"{workspaceRoot}/libs/brain/hlm-tailwind-preset.css",
+				"{workspaceRoot}/libs/tools/src/generators/generate-hlm-component-preview/**/*",
+				"{workspaceRoot}/libs/tools/src/write-per-component-data.ts",
+				"{workspaceRoot}/package.json",
+				"{workspaceRoot}/.prettierrc",
+				{
+					"externalDependencies": ["prettier"]
+				}
+			],
+			"outputs": [
+				"{projectRoot}/src/public/data/manual-install-snippets",
+				"{projectRoot}/src/public/data/stackblitz-meta.json",
+				"{projectRoot}/src/public/data/stackblitz-project.json",
+				"{projectRoot}/src/app/pages/(documentation)/documentation/(ui)/hlm-tailwind-preset.snippet.ts"
+			],
 			"options": {
-				"commands": ["npx nx generate @spartan-ng/tools:generate-hlm-component-preview"],
-				"parallel": false
+				"command": "nx generate @spartan-ng/tools:generate-hlm-component-preview"
+			}
+		},
+		"generate-primitive-snippets": {
+			"executor": "nx:run-commands",
+			"cache": true,
+			"inputs": [
+				"{projectRoot}/src/app/pages/**/*",
+				"{workspaceRoot}/libs/tools/src/generators/generate-primitive-snippets/**/*",
+				"{workspaceRoot}/libs/tools/src/write-per-component-data.ts",
+				"{workspaceRoot}/.prettierrc",
+				{
+					"externalDependencies": ["prettier", "typescript"]
+				}
+			],
+			"outputs": [
+				"{projectRoot}/src/public/data/primitives-snippets",
+				"{projectRoot}/src/public/data/stackblitz-example-files.json"
+			],
+			"options": {
+				"command": "nx generate @spartan-ng/tools:generate-primitive-snippets"
 			}
 		}
 	}

@@ -87,6 +87,10 @@ export default defineConfig(({ command, mode }) => {
 				},
 			},
 			analog({
+				// @analogjs/platform defaults this to false, so the dev server ran full TypeScript + template
+				// type-checking on every file it transformed (~15% of startup CPU, ~500 MB). The IDE, lint and
+				// the production build still report type errors.
+				disableTypeChecking: isServe,
 				content: {
 					highlighter: 'prism',
 				},
